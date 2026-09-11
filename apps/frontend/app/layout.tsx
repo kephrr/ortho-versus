@@ -15,7 +15,7 @@ const fredoka = Fredoka({
 })
 
 export const metadata: Metadata = {
-  title: 'BlablaType - Concours de Dictée',
+  title: 'Ortho Versus - Concours de Dictée',
   description: 'Un jeu d\'orthographe multijoueur fun et éducatif',
 }
 

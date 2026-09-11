@@ -37,7 +37,7 @@ export default function Home() {
           
           <header className="mb-12 text-center w-full">
             <h1 className="text-5xl md:text-6xl font-display font-bold text-slate-800 tracking-tight">
-              Blabla<span className="text-[var(--color-brand-primary)]">Type</span>
+              Ortho <span className="text-[var(--color-brand-primary)]">Versus</span>
             </h1>
             <p className="mt-4 text-xl text-slate-500 font-sans font-medium">
               Tapez avec précision, battez vos amis !

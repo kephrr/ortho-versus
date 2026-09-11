@@ -131,7 +131,7 @@ export class AudioDownloader {
     console.log(`[AudioDownloader] Récupération du flux RSS Podcast : ${feedUrl}`)
     const response = await fetch(feedUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) BlablaTypeCurator/1.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) OrthoVersusCurator/1.0',
       },
     })
 
@@ -220,7 +220,7 @@ export class AudioDownloader {
     // Remote HTTP/HTTPS URL
     const response = await fetch(sourceUrlOrPath, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) BlablaTypeCurator/1.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) OrthoVersusCurator/1.0',
       },
       redirect: 'follow',
     })

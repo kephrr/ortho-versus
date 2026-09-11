@@ -30,7 +30,7 @@ const program = new Command()
 
 program
   .name('audio-curator')
-  .description("Outil CLI d'ingestion, normalisation et validation IA d'extraits audio pour BlablaType")
+  .description("Outil CLI d'ingestion, normalisation et validation IA d'extraits audio pour Ortho Versus")
   .version('0.0.1')
 
 // --- Command: process ---
@@ -123,7 +123,7 @@ program
       const storage = new StorageService(options.outputDir)
       const stats = await storage.getStats()
 
-      console.log('\n--- Statistiques BlablaType Audio Curator ---')
+      console.log('\n--- Statistiques Ortho Versus Audio Curator ---')
       console.log(`Total échantillons : ${stats.total}`)
       console.log(`Prêts pour le jeu : ${stats.ready}`)
       console.log(`Rejetés : ${stats.rejected}`)

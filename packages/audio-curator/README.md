@@ -1,6 +1,6 @@
 # @app/audio-curator
 
-Service et outil CLI d'ingestion, de découpage, de normalisation et de validation sémantique d'extraits audio pour le jeu **BlablaType** (concours multijoueur de dictée en temps réel).
+Service et outil CLI d'ingestion, de découpage, de normalisation et de validation sémantique d'extraits audio pour le jeu **Ortho Versus** (concours multijoueur de dictée en temps réel).
 
 ---
 

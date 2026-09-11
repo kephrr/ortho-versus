@@ -37,7 +37,7 @@ export class SemanticValidator {
 
     console.log(`[SemanticValidator] Évaluation sémantique et orthographique avec gpt-4o-mini...`)
 
-    const systemPrompt = `Tu es l'expert linguiste et examinateur officiel du jeu BlablaType (concours multijoueur de dictée en français).
+    const systemPrompt = `Tu es l'expert linguiste et examinateur officiel du jeu Ortho Versus (concours multijoueur de dictée en français).
 
 Ton rôle est d'analyser la transcription brute d'un extrait audio afin de déterminer s'il est parfaitement adapté pour une dictée en temps réel.
 

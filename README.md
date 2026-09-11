@@ -1,13 +1,13 @@
-# Alphabet Contest 🏆
+# Ortho Versus 🏆
 
-Monorepo **PNPM** pour l'application multijoueur de tournoi d'orthographe en temps réel ("Alphabet Contest"), combinant **AdonisJS v6** (WebSockets / Socket.io) et **Next.js (App Router / Tailwind CSS)** avec partage de typage de bout en bout via `@app/shared`.
+Monorepo **PNPM** pour l'application multijoueur de tournoi d'orthographe en temps réel ("Ortho Versus"), combinant **AdonisJS v6** (WebSockets / Socket.io) et **Next.js (App Router / Tailwind CSS)** avec partage de typage de bout en bout via `@app/shared`.
 
 ---
 
 ## 📁 Architecture du Monorepo
 
 ```text
-alphabet-contest/
+ortho-versus-monorepo/
 ├── package.json             # Scripts racine (dev, build, typecheck, lint)
 ├── pnpm-workspace.yaml      # Déclaration des workspaces apps/* et packages/*
 ├── tsconfig.base.json       # Base TypeScript partagée (NodeNext, ES2022)
