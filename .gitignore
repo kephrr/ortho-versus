@@ -1,0 +1,36 @@
+# Node dependencies
+node_modules/
+.pnpm-store/
+
+# Build artifacts
+dist/
+build/
+.next/
+out/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE & OS
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Specific projects
+apps/backend/tmp/
+apps/backend/database/data/audio_samples.json
