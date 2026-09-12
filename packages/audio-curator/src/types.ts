@@ -1,9 +1,9 @@
-import { z } from 'zod'
+﻿import { z } from 'zod'
 import type { AudioDifficulty, AudioValidationStatus, ValidatedAudioSample } from '@app/shared'
 
 export type { AudioDifficulty, AudioValidationStatus, ValidatedAudioSample }
 
-export type AudioSourceType = 'YOUTUBE' | 'PODCAST' | 'DIRECT_FILE'
+export type AudioSourceType = 'YOUTUBE' | 'DIRECT_FILE'
 
 export const LLMValidationResultSchema = z.object({
   status: z
@@ -35,9 +35,10 @@ export const LLMValidationResultSchema = z.object({
     ),
   difficulty: z
     .enum(['FACILE', 'MOYEN', 'DIFFICILE'])
-    .describe(
-      "Niveau de difficulté pour des joueurs de dictée : 'FACILE' (vocabulaire courant, phrases simples, accords directs), 'MOYEN' (temps composés, subjonctif, vocabulaire varié, accords du participe passé), 'DIFFICILE' (littéraire, mots rares, pièges orthographiques, temps du passé simple / subjonctif imparfait)."
-    ),
+    .describe("Niveau de difficulté pour des joueurs de dictée"),
+  topic: z
+    .string()
+    .describe("Thème ou sujet principal de l'extrait en un ou deux mots (ex: Histoire, Sciences, Littérature, Chronique, etc.)"),
   wordCount: z
     .number()
     .int()
@@ -56,15 +57,15 @@ export interface ProcessedAudioSegment {
 export interface CuratorPipelineOptions {
   sourceUrl: string
   sourceType?: AudioSourceType
-  startTime?: number | string // Start offset in seconds or "HH:MM:SS"
-  segmentDuration?: number // In seconds (default: 40)
-  maxSegments?: number // Max segments to extract and validate (default: 1)
-  outputDir?: string // Destination folder for audios (default: apps/backend/public/uploads/audio)
-  manifestPath?: string // Destination for samples.json manifest
+  startTime?: number | string
+  segmentDuration?: number
+  maxSegments?: number
+  outputDir?: string
+  manifestPath?: string
   openAiApiKey?: string
-  skipValidation?: boolean // Bypass LLM & Whisper (useful for testing or direct ingestion)
-  minDurationSeconds?: number // Minimum acceptable duration (default: 30)
-  maxDurationSeconds?: number // Maximum acceptable duration (default: 90)
+  skipValidation?: boolean
+  minDurationSeconds?: number
+  maxDurationSeconds?: number
 }
 
 export interface CuratorPipelineResult {
@@ -74,11 +75,4 @@ export interface CuratorPipelineResult {
   readyCount: number
   rejectedCount: number
   samples: ValidatedAudioSample[]
-}
-
-export interface PodcastEpisodeInfo {
-  title: string
-  audioUrl: string
-  pubDate?: string
-  duration?: string
 }

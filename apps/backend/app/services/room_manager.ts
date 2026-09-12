@@ -26,18 +26,18 @@ class RoomManager {
   private sampleChallenges = [
     {
       transcript: 'Les ornithorynques nagent paisiblement dans la rivière scintillante.',
-      audioUrl: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',
-      duration: 15,
+      audioUrl: '/audios/video_extrait_45s.mp3',
+      duration: 45,
     },
     {
       transcript: 'L’anticonstitutionnellement long discours a captivé toute l’assemblée.',
-      audioUrl: 'https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg',
-      duration: 18,
+      audioUrl: '/audios/video_extrait_45s.mp3',
+      duration: 45,
     },
     {
       transcript: 'Des chrysalides mystérieuses émergent de merveilleux papillons diaprés.',
-      audioUrl: 'https://actions.google.com/sounds/v1/weather/light_rain_on_leaves.ogg',
-      duration: 15,
+      audioUrl: '/audios/video_extrait_45s.mp3',
+      duration: 45,
     },
   ]
 

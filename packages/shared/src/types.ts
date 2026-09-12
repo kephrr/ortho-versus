@@ -1,4 +1,4 @@
-export type RoomStatus = 'LOBBY' | 'STARTING' | 'PLAYING' | 'EVALUATING' | 'FINISHED'
+﻿export type RoomStatus = 'LOBBY' | 'STARTING' | 'PLAYING' | 'EVALUATING' | 'FINISHED'
 
 export interface Player {
   id: string
@@ -35,14 +35,15 @@ export type AudioValidationStatus = 'READY' | 'REJECTED'
 
 export interface ValidatedAudioSample {
   id: string
-  sourceType: 'YOUTUBE' | 'PODCAST' | 'DIRECT_FILE'
+  sourceType: 'YOUTUBE' | 'DIRECT_FILE'
   sourceUrl: string
-  audioFileName: string
+  audioR2Url: string
   durationSeconds: number
   targetTranscript: string
+  wordCount: number
   difficulty: AudioDifficulty
+  topic: string
   status: AudioValidationStatus
   rejectionReason?: string
-  wordCount: number
   createdAt: string
 }
