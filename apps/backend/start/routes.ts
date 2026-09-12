@@ -9,10 +9,15 @@
 
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
+import app from '@adonisjs/core/services/app'
 import { controllers } from '#generated/controllers'
 
 router.get('/', () => {
   return { hello: 'world' }
+})
+
+router.get('/audios/:file', async ({ params, response }) => {
+  return response.download(app.publicPath(`audios/${params.file}`))
 })
 
 router

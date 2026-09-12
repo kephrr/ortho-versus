@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      typescript:
+        specifier: ^5.7.3
+        version: 5.7.3
 
   apps/backend:
     dependencies:
@@ -197,7 +201,11 @@ importers:
         specifier: ~5.7.3
         version: 5.7.3
 
-  packages/shared: {}
+  packages/shared:
+    devDependencies:
+      typescript:
+        specifier: ^5.7.3
+        version: 5.7.3
 
 packages:
 

@@ -20,6 +20,14 @@ interface SocketContextValue {
   error: string | null
   currentPlayerNickname: string
   audioPreloaded: boolean
+  isAudioPlaying: boolean
+  audioBlocked: boolean
+  audioCurrentTime: number
+  audioDuration: number
+  playAudio: () => void
+  pauseAudio: () => void
+  toggleAudio: () => void
+  replayAudio: () => void
   joinRoom: (roomCode: string, nickname: string, avatar: string) => void
   startRoom: () => void
   submitInput: (text: string) => void
@@ -38,8 +46,51 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null)
   const [currentPlayerNickname, setCurrentPlayerNickname] = useState<string>('')
   const [audioPreloaded, setAudioPreloaded] = useState(false)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+  const [audioBlocked, setAudioBlocked] = useState(false)
+  const [audioCurrentTime, setAudioCurrentTime] = useState(0)
+  const [audioDuration, setAudioDuration] = useState(0)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  // Initialize audio element on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const audio = new Audio()
+      audio.preload = 'auto'
+
+      audio.onplay = () => {
+        setIsAudioPlaying(true)
+        setAudioBlocked(false)
+      }
+      audio.onpause = () => setIsAudioPlaying(false)
+      audio.onended = () => setIsAudioPlaying(false)
+      audio.ontimeupdate = () => setAudioCurrentTime(audio.currentTime)
+      audio.onloadedmetadata = () => setAudioDuration(audio.duration || 0)
+      audio.onerror = (e) => {
+        console.warn('[Audio] Element error:', e)
+      }
+
+      audioRef.current = audio
+
+      return () => {
+        audio.pause()
+        audio.src = ''
+        audioRef.current = null
+      }
+    }
+  }, [])
+
+  // Preload audio as soon as audioUrl is known from room state
+  useEffect(() => {
+    if (roomState?.audioUrl && audioRef.current) {
+      if (!audioRef.current.src || !audioRef.current.src.endsWith(roomState.audioUrl)) {
+        audioRef.current.src = roomState.audioUrl
+        audioRef.current.load()
+        setAudioPreloaded(true)
+      }
+    }
+  }, [roomState?.audioUrl])
 
   useEffect(() => {
     const s: Socket<ServerToClientEvents, ClientToServerEvents> = io(BACKEND_URL, {
@@ -53,6 +104,9 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         setResults(null)
         setCountdown(null)
         setGameAudio(null)
+        setIsAudioPlaying(false)
+        setAudioBlocked(false)
+        setAudioCurrentTime(0)
       }
     })
 
@@ -68,12 +122,22 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       setCountdown(null)
       setGameAudio({ url: payload.audioUrl, duration: payload.durationSeconds })
 
-      // Play the preloaded audio immediately
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0
-        audioRef.current.play().catch((err) => {
-          console.warn('[Audio] Autoplay blocked, user interaction required:', err)
-        })
+      const audio = audioRef.current
+      if (audio) {
+        if (!audio.src || !audio.src.endsWith(payload.audioUrl)) {
+          audio.src = payload.audioUrl
+        }
+        audio.currentTime = 0
+        audio.play()
+          .then(() => {
+            setIsAudioPlaying(true)
+            setAudioBlocked(false)
+          })
+          .catch((err) => {
+            console.warn('[Audio] Autoplay blocked, user interaction required:', err)
+            setIsAudioPlaying(false)
+            setAudioBlocked(true)
+          })
       }
     })
 
@@ -81,6 +145,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       setResults(payload)
       if (audioRef.current) {
         audioRef.current.pause()
+        setIsAudioPlaying(false)
       }
     })
 
@@ -91,16 +156,45 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // Audio preloader when countdown or starting begins
-  useEffect(() => {
-    if (roomState?.status === 'STARTING') {
-      // Pre-warm audio element
-      if (!audioRef.current) {
-        audioRef.current = new Audio()
-      }
-      setAudioPreloaded(true)
+  const playAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.play()
+        .then(() => {
+          setIsAudioPlaying(true)
+          setAudioBlocked(false)
+        })
+        .catch((err) => {
+          console.warn('[Audio] Manual play error:', err)
+        })
     }
-  }, [roomState?.status])
+  }
+
+  const pauseAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause()
+      setIsAudioPlaying(false)
+    }
+  }
+
+  const toggleAudio = () => {
+    if (isAudioPlaying) {
+      pauseAudio()
+    } else {
+      playAudio()
+    }
+  }
+
+  const replayAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0
+      audioRef.current.play()
+        .then(() => {
+          setIsAudioPlaying(true)
+          setAudioBlocked(false)
+        })
+        .catch(console.error)
+    }
+  }
 
   const joinRoom = (roomCode: string, nickname: string, avatar: string) => {
     if (!socket) return
@@ -110,6 +204,13 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
   const startRoom = () => {
     if (!socket || !roomState) return
+    // Pre-arm audio on direct user click to satisfy browser user activation policy
+    if (audioRef.current && roomState.audioUrl) {
+      if (!audioRef.current.src || !audioRef.current.src.endsWith(roomState.audioUrl)) {
+        audioRef.current.src = roomState.audioUrl
+      }
+      audioRef.current.load()
+    }
     socket.emit('room:start', { roomCode: roomState.code })
   }
 
@@ -123,6 +224,12 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const resetGame = () => {
     setResults(null)
     setCountdown(null)
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+    }
+    setIsAudioPlaying(false)
+    setAudioBlocked(false)
   }
 
   return (
@@ -136,6 +243,14 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         error,
         currentPlayerNickname,
         audioPreloaded,
+        isAudioPlaying,
+        audioBlocked,
+        audioCurrentTime,
+        audioDuration,
+        playAudio,
+        pauseAudio,
+        toggleAudio,
+        replayAudio,
         joinRoom,
         startRoom,
         submitInput,

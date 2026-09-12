@@ -25,19 +25,9 @@ class RoomManager {
   // Sample spelling challenges
   private sampleChallenges = [
     {
-      transcript: 'Les ornithorynques nagent paisiblement dans la rivière scintillante.',
+      transcript: "On comprend absolument tout et c'est légitime de vous poser la question. Est-ce que Pierre voulait racheter le Multipla ?",
       audioUrl: '/audios/video_extrait_45s.mp3',
-      duration: 45,
-    },
-    {
-      transcript: 'L’anticonstitutionnellement long discours a captivé toute l’assemblée.',
-      audioUrl: '/audios/video_extrait_45s.mp3',
-      duration: 45,
-    },
-    {
-      transcript: 'Des chrysalides mystérieuses émergent de merveilleux papillons diaprés.',
-      audioUrl: '/audios/video_extrait_45s.mp3',
-      duration: 45,
+      duration: 54,
     },
   ]
 
@@ -76,6 +66,7 @@ class RoomManager {
       maxPlayers: room.maxPlayers,
       players: room.players,
       audioDurationSeconds: room.audioDurationSeconds,
+      audioUrl: room.audioUrl,
     }
   }
 

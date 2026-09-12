@@ -1,9 +1,22 @@
-﻿{
+{
   "name": "ortho-versus",
   "version": "1.0.0",
   "private": true,
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "pnpm@9.0.0"
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @app/backend --filter @app/frontend dev",
+    "dev:back": "pnpm --filter @app/backend dev",
+    "dev:front": "pnpm --filter @app/frontend dev",
+    "build:shared": "pnpm --filter @app/shared build",
+    "build": "pnpm build:shared && pnpm --recursive run build",
+    "typecheck": "pnpm build:shared && pnpm --recursive run typecheck",
+    "lint": "pnpm --filter @app/backend run lint && pnpm --filter @app/frontend run lint",
+    "curate": "pnpm --filter @app/audio-curator start"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
 }

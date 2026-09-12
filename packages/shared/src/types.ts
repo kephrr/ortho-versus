@@ -1,4 +1,4 @@
-﻿export type RoomStatus = 'LOBBY' | 'STARTING' | 'PLAYING' | 'EVALUATING' | 'FINISHED'
+export type RoomStatus = 'LOBBY' | 'STARTING' | 'PLAYING' | 'EVALUATING' | 'FINISHED'
 
 export interface Player {
   id: string
@@ -14,6 +14,7 @@ export interface RoomState {
   maxPlayers: number
   players: Player[]
   audioDurationSeconds: number
+  audioUrl?: string
 }
 
 export interface PlayerResult {

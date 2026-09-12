@@ -55,7 +55,7 @@ export function RoomLobby() {
           <Volume2 className="w-6 h-6" />
         </div>
         <p className="text-slate-600 font-sans text-sm font-medium pt-1">
-          L'audio sera chargé dès le décompte de 10 secondes. Mettez le son !
+          L'audio est préchargé et démarrera automatiquement à la fin du décompte. Mettez le son !
         </p>
       </div>
 

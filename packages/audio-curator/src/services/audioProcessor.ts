@@ -32,6 +32,9 @@ export async function sliceAndNormalize(rawAudioPath: string, targetDuration: nu
   const totalDuration = await new Promise<number>((resolve, reject) => {
     ffmpeg.ffprobe(rawAudioPath, (err: Error | null, data: ffmpeg.FfprobeData) => {
       if (err) return reject(err);
+      if (!data.format.duration) {
+        return reject(new Error('Impossible de déterminer la durée du fichier audio'));
+      }
       resolve(data.format.duration);
     });
   });
