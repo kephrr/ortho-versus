@@ -10,6 +10,6 @@ export interface ServerToClientEvents {
   'room:state_sync': (state: RoomState) => void
   'room:error': (message: string) => void
   'game:countdown': (secondsLeft: number) => void
-  'game:started': (payload: { audioUrl: string; durationSeconds: number }) => void
+  'game:started': (payload: { audioUrl: string; durationSeconds: number; writingDurationSeconds: number }) => void
   'game:results': (payload: GameResultsPayload) => void
 }

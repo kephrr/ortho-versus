@@ -27,7 +27,7 @@ export function GameActive() {
     replayAudio,
   } = useSocket()
   const [inputText, setInputText] = useState('')
-  const [secondsRemaining, setSecondsRemaining] = useState<number>(roomState?.audioDurationSeconds || 54)
+  const [secondsRemaining, setSecondsRemaining] = useState<number>(roomState?.writingDurationSeconds || 45)
 
   // Real-time keystroke submission
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -36,10 +36,10 @@ export function GameActive() {
     submitInput(val)
   }
 
-  // Timer countdown while playing
+  // Timer countdown while playing (writing phase: 45s)
   useEffect(() => {
     if (roomState?.status === 'PLAYING') {
-      const duration = gameAudio?.duration || roomState.audioDurationSeconds || 54
+      const duration = gameAudio?.writingDuration || roomState?.writingDurationSeconds || 45
       setSecondsRemaining(duration)
 
       const interval = setInterval(() => {
@@ -54,7 +54,7 @@ export function GameActive() {
 
       return () => clearInterval(interval)
     }
-  }, [roomState?.status, gameAudio?.duration, roomState?.audioDurationSeconds])
+  }, [roomState?.status, gameAudio?.writingDuration, roomState?.writingDurationSeconds])
 
   // If in countdown state (5, 4, 3, 2, 1)
   if (roomState?.status === 'STARTING') {
@@ -91,7 +91,7 @@ export function GameActive() {
 
   // Active playing phase
   const isTimeLow = secondsRemaining <= 5
-  const totalAudioDuration = audioDuration || gameAudio?.duration || roomState?.audioDurationSeconds || 54
+  const totalAudioDuration = audioDuration || gameAudio?.duration || roomState?.audioDurationSeconds || 20
   const audioProgressPercent = totalAudioDuration > 0 ? Math.min(100, (audioCurrentTime / totalAudioDuration) * 100) : 0
 
   return (

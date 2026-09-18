@@ -21,7 +21,7 @@ interface SocketContextValue {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null
   roomState: RoomState | null
   countdown: number | null
-  gameAudio: { url: string; duration: number } | null
+  gameAudio: { url: string; duration: number; writingDuration: number } | null
   results: GameResultsPayload | null
   error: string | null
   currentPlayerNickname: string
@@ -49,7 +49,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null)
   const [roomState, setRoomState] = useState<RoomState | null>(null)
   const [countdown, setCountdown] = useState<number | null>(null)
-  const [gameAudio, setGameAudio] = useState<{ url: string; duration: number } | null>(null)
+  const [gameAudio, setGameAudio] = useState<{ url: string; duration: number; writingDuration: number } | null>(null)
   const [results, setResults] = useState<GameResultsPayload | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [currentPlayerNickname, setCurrentPlayerNickname] = useState<string>('')
@@ -145,7 +145,11 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
     s.on('game:started', (payload) => {
       setCountdown(null)
-      setGameAudio({ url: payload.audioUrl, duration: payload.durationSeconds })
+      setGameAudio({
+        url: payload.audioUrl,
+        duration: payload.durationSeconds,
+        writingDuration: payload.writingDurationSeconds,
+      })
 
       const audio = audioRef.current
       if (audio) {

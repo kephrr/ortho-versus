@@ -14,6 +14,7 @@ export interface RoomState {
   maxPlayers: number
   players: Player[]
   audioDurationSeconds: number
+  writingDurationSeconds: number
   audioUrl?: string
 }
 

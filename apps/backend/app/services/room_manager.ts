@@ -13,6 +13,7 @@ export interface ServerRoom {
   maxPlayers: number
   players: Player[]
   audioDurationSeconds: number
+  writingDurationSeconds: number
   targetTranscript: string
   audioUrl: string
   submissions: Map<string, string> // playerId -> text
@@ -26,8 +27,9 @@ class RoomManager {
   private sampleChallenges = [
     {
       transcript: "On comprend absolument tout et c'est légitime de vous poser la question. Est-ce que Pierre voulait racheter le Multipla ?",
-      audioUrl: '/audios/video_extrait_45s.mp3',
-      duration: 54,
+      audioUrl: '/audios/video_extrait_20s.mp3',
+      audioDuration: 20,
+      writingDuration: 45,
     },
   ]
 
@@ -44,7 +46,8 @@ class RoomManager {
         status: 'LOBBY',
         maxPlayers: 8,
         players: [],
-        audioDurationSeconds: randomChallenge.duration,
+        audioDurationSeconds: randomChallenge.audioDuration,
+        writingDurationSeconds: randomChallenge.writingDuration,
         targetTranscript: randomChallenge.transcript,
         audioUrl: randomChallenge.audioUrl,
         submissions: new Map(),
@@ -66,6 +69,7 @@ class RoomManager {
       maxPlayers: room.maxPlayers,
       players: room.players,
       audioDurationSeconds: room.audioDurationSeconds,
+      writingDurationSeconds: room.writingDurationSeconds,
       audioUrl: room.audioUrl,
     }
   }

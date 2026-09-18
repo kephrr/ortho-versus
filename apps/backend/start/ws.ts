@@ -82,6 +82,7 @@ app.ready(() => {
           io?.to(room.code).emit('game:started', {
             audioUrl: room.audioUrl,
             durationSeconds: room.audioDurationSeconds,
+            writingDurationSeconds: room.writingDurationSeconds,
           })
 
           // Set timeout for game end
@@ -96,7 +97,7 @@ app.ready(() => {
 
             room.status = 'FINISHED'
             io?.to(room.code).emit('room:state_sync', roomManager.getPublicState(room))
-          }, room.audioDurationSeconds * 1000)
+          }, room.writingDurationSeconds * 1000)
         }
       }, 1000)
     })
