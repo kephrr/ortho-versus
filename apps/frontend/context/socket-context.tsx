@@ -9,7 +9,13 @@ import type {
   GameResultsPayload,
 } from '@app/shared'
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3333'
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  (typeof window !== 'undefined'
+    ? `http://${window.location.hostname}:3333`
+    : 'http://localhost:3333')
+
+export type AudioPlaybackRate = 0.75 | 1 | 1.25
 
 interface SocketContextValue {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null
@@ -24,6 +30,8 @@ interface SocketContextValue {
   audioBlocked: boolean
   audioCurrentTime: number
   audioDuration: number
+  playbackRate: AudioPlaybackRate
+  setPlaybackRate: (rate: AudioPlaybackRate) => void
   playAudio: () => void
   pauseAudio: () => void
   toggleAudio: () => void
@@ -50,8 +58,24 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [audioBlocked, setAudioBlocked] = useState(false)
   const [audioCurrentTime, setAudioCurrentTime] = useState(0)
   const [audioDuration, setAudioDuration] = useState(0)
+  const [playbackRate, setPlaybackRateState] = useState<AudioPlaybackRate>(1)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const playbackRateRef = useRef<AudioPlaybackRate>(1)
+
+  useEffect(() => {
+    playbackRateRef.current = playbackRate
+    if (audioRef.current) {
+      audioRef.current.playbackRate = playbackRate
+    }
+  }, [playbackRate])
+
+  const setPlaybackRate = (rate: AudioPlaybackRate) => {
+    setPlaybackRateState(rate)
+    if (audioRef.current) {
+      audioRef.current.playbackRate = rate
+    }
+  }
 
   // Initialize audio element on mount
   useEffect(() => {
@@ -62,6 +86,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       audio.onplay = () => {
         setIsAudioPlaying(true)
         setAudioBlocked(false)
+        audio.playbackRate = playbackRateRef.current
       }
       audio.onpause = () => setIsAudioPlaying(false)
       audio.onended = () => setIsAudioPlaying(false)
@@ -247,6 +272,8 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         audioBlocked,
         audioCurrentTime,
         audioDuration,
+        playbackRate,
+        setPlaybackRate,
         playAudio,
         pauseAudio,
         toggleAudio,

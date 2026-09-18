@@ -20,6 +20,8 @@ export function GameActive() {
     audioBlocked,
     audioCurrentTime,
     audioDuration,
+    playbackRate,
+    setPlaybackRate,
     playAudio,
     toggleAudio,
     replayAudio,
@@ -165,7 +167,7 @@ export function GameActive() {
         </button>
 
         {/* Audio Progress Track */}
-        <div className="flex-1 flex flex-col justify-center">
+        <div className="flex-1 min-w-[100px] flex flex-col justify-center">
           <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden shadow-inner">
             <div
               className="bg-[var(--color-brand-primary)] h-full rounded-full transition-all duration-300 ease-out"
@@ -176,6 +178,24 @@ export function GameActive() {
             <span>{formatTime(audioCurrentTime)}</span>
             <span>{formatTime(totalAudioDuration)}</span>
           </div>
+        </div>
+
+        {/* Speed Selector */}
+        <div className="flex items-center bg-white border border-slate-200 rounded-xl p-0.5 shadow-sm shrink-0">
+          {([0.75, 1, 1.25] as const).map((rate) => (
+            <button
+              key={rate}
+              onClick={() => setPlaybackRate(rate)}
+              className={`px-2 py-1 rounded-lg text-xs font-display font-bold transition-all cursor-pointer ${
+                playbackRate === rate
+                  ? 'bg-[var(--color-brand-primary)] text-white shadow-xs'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+              }`}
+              title={`Vitesse de lecture x${rate}`}
+            >
+              x{rate}
+            </button>
+          ))}
         </div>
       </div>
 
