@@ -96,6 +96,9 @@ export function LobbyJoin() {
               onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
               placeholder="Ex: AB12"
               maxLength={6}
+              autoCapitalize="characters"
+              autoCorrect="off"
+              spellCheck={false}
               className="w-full pl-11 pr-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl text-slate-800 uppercase font-sans font-bold tracking-widest placeholder-slate-400 focus:outline-none focus:border-[var(--color-brand-secondary)] focus:bg-white transition-all shadow-inner"
             />
           </div>
