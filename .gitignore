@@ -34,3 +34,7 @@ pnpm-debug.log*
 # Specific projects
 apps/backend/tmp/
 apps/backend/database/data/audio_samples.json
+apps/backend/public/uploads/
+apps/frontend/public/uploads/
+public/uploads/
+.design/

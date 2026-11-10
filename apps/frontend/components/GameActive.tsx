@@ -1,19 +1,14 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSocket } from '../context/socket-context'
-import { Volume2, VolumeX, Clock, CheckCircle2, Type, Play, Pause, RotateCcw } from 'lucide-react'
-
-function formatTime(seconds: number): string {
-  const mins = Math.floor(seconds / 60)
-  const secs = Math.floor(seconds % 60)
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-}
+import { GameView } from './views/GameView'
 
 export function GameActive() {
   const {
     countdown,
     roomState,
+    currentPlayerNickname,
     gameAudio,
     submitInput,
     isAudioPlaying,
@@ -26,205 +21,57 @@ export function GameActive() {
     toggleAudio,
     replayAudio,
   } = useSocket()
+
   const [inputText, setInputText] = useState('')
-  const [secondsRemaining, setSecondsRemaining] = useState<number>(roomState?.writingDurationSeconds || 45)
+  const [secondsRemaining, setSecondsRemaining] = useState(
+    roomState?.writingDurationSeconds || 45
+  )
 
-  // Real-time keystroke submission
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const val = e.target.value
-    setInputText(val)
-    submitInput(val)
+  const writingDuration =
+    gameAudio?.writingDuration || roomState?.writingDurationSeconds || 45
+
+  // Auto-save on every keystroke
+  const handleInputChange = (value: string) => {
+    setInputText(value)
+    submitInput(value)
   }
 
-  // Timer countdown while playing (writing phase: 45s)
+  // Countdown based on an absolute end date to avoid drift
   useEffect(() => {
-    if (roomState?.status === 'PLAYING') {
-      const duration = gameAudio?.writingDuration || roomState?.writingDurationSeconds || 45
-      setSecondsRemaining(duration)
+    if (roomState?.status !== 'PLAYING') return
 
-      const interval = setInterval(() => {
-        setSecondsRemaining((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval)
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
+    const endsAt = Date.now() + writingDuration * 1000
+    const interval = setInterval(() => {
+      setSecondsRemaining(Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)))
+    }, 250)
 
-      return () => clearInterval(interval)
-    }
-  }, [roomState?.status, gameAudio?.writingDuration, roomState?.writingDurationSeconds])
+    return () => clearInterval(interval)
+  }, [roomState?.status, writingDuration])
 
-  // If in countdown state (5, 4, 3, 2, 1)
-  if (roomState?.status === 'STARTING') {
-    return (
-      <div className="card-playful p-12 w-full max-w-md mx-auto text-center">
-        <span className="text-sm font-display font-bold uppercase tracking-wider text-[var(--color-brand-primary)]">
-          Préparez-vous...
-        </span>
-        <div className="my-6 text-8xl font-display font-black text-slate-800 tabular-nums">
-          {countdown ?? 5}
-        </div>
-        <p className="text-slate-500 font-sans text-lg flex items-center justify-center gap-3">
-          <Volume2 className="w-5 h-5 text-green-500 animate-pulse" />
-          Mettez le son, la dictée démarre !
-        </p>
-      </div>
-    )
-  }
-
-  // If evaluating state
-  if (roomState?.status === 'EVALUATING') {
-    return (
-      <div className="card-playful p-12 w-full max-w-md mx-auto text-center space-y-6">
-        <div className="inline-flex rounded-full p-4 bg-orange-100 text-orange-500">
-          <CheckCircle2 className="w-12 h-12 animate-pulse" />
-        </div>
-        <div>
-          <h2 className="text-3xl font-display font-bold text-slate-800">Correction...</h2>
-          <p className="text-slate-500 mt-2 font-sans font-medium">Analyse méticuleuse de vos copies !</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Active playing phase
-  const isTimeLow = secondsRemaining <= 5
-  const totalAudioDuration = audioDuration || gameAudio?.duration || roomState?.audioDurationSeconds || 20
-  const audioProgressPercent = totalAudioDuration > 0 ? Math.min(100, (audioCurrentTime / totalAudioDuration) * 100) : 0
+  if (!roomState) return null
 
   return (
-    <div className="card-playful w-full max-w-2xl mx-auto flex flex-col h-full overflow-hidden">
-      {/* Autoplay Blocked Alert */}
-      {audioBlocked && (
-        <div className="bg-amber-50 border-b-2 border-amber-200 px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-amber-800 text-sm font-sans font-medium">
-            <VolumeX className="w-5 h-5 text-amber-600 shrink-0" />
-            <span>Votre navigateur a bloqué la lecture automatique.</span>
-          </div>
-          <button
-            onClick={playAudio}
-            className="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-display font-bold rounded-xl text-sm shadow-sm transition-all flex items-center gap-2 animate-bounce cursor-pointer"
-          >
-            <Play className="w-4 h-4 fill-current" /> Lancer l'audio
-          </button>
-        </div>
-      )}
-
-      {/* Active Header & Timer */}
-      <div className="flex justify-between items-center bg-slate-50 border-b-2 border-slate-100 p-4 md:px-8">
-        <div className="flex items-center gap-3">
-          <div className={`flex items-center justify-center w-12 h-12 rounded-2xl shadow-sm border transition-colors ${
-            isAudioPlaying
-              ? 'bg-green-100 text-green-600 border-green-200'
-              : 'bg-blue-100 text-blue-500 border-blue-200'
-          }`}>
-            <Volume2 className={`w-6 h-6 ${isAudioPlaying ? 'animate-pulse' : ''}`} />
-          </div>
-          <div>
-            <span className="text-sm font-display font-bold text-slate-800 block">Dictée audio</span>
-            <span className="text-xs text-slate-500 font-sans">
-              {isAudioPlaying ? 'Lecture en cours...' : 'Audio en pause'}
-            </span>
-          </div>
-        </div>
-
-        <div className={`flex items-center gap-2 px-5 py-3 rounded-2xl border-4 font-display font-bold text-xl transition-colors ${
-          isTimeLow 
-          ? 'bg-red-50 border-red-200 text-red-600 animate-pulse' 
-          : 'bg-white border-slate-200 text-slate-700 shadow-sm'
-        }`}>
-          <Clock className={`w-5 h-5 ${isTimeLow ? 'text-red-500' : 'text-slate-400'}`} />
-          <span className="tabular-nums min-w-[3ch] text-center">{secondsRemaining}s</span>
-        </div>
-      </div>
-
-      {/* Audio Player Controls Bar */}
-      <div className="bg-slate-100 border-b border-slate-200 px-4 md:px-8 py-3 flex items-center gap-4">
-        <button
-          onClick={toggleAudio}
-          className={`p-2.5 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center ${
-            isAudioPlaying
-              ? 'bg-[var(--color-brand-primary)] text-white hover:opacity-90'
-              : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
-          }`}
-          title={isAudioPlaying ? 'Mettre en pause' : 'Lancer la lecture'}
-        >
-          {isAudioPlaying ? (
-            <Pause className="w-5 h-5 fill-current" />
-          ) : (
-            <Play className="w-5 h-5 fill-current ml-0.5" />
-          )}
-        </button>
-
-        <button
-          onClick={replayAudio}
-          className="p-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center"
-          title="Réécouter depuis le début"
-        >
-          <RotateCcw className="w-4 h-4" />
-        </button>
-
-        {/* Audio Progress Track */}
-        <div className="flex-1 min-w-[100px] flex flex-col justify-center">
-          <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden shadow-inner">
-            <div
-              className="bg-[var(--color-brand-primary)] h-full rounded-full transition-all duration-300 ease-out"
-              style={{ width: `${audioProgressPercent}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-xs text-slate-500 mt-1 font-sans font-medium tabular-nums">
-            <span>{formatTime(audioCurrentTime)}</span>
-            <span>{formatTime(totalAudioDuration)}</span>
-          </div>
-        </div>
-
-        {/* Speed Selector */}
-        <div className="flex items-center bg-white border border-slate-200 rounded-xl p-0.5 shadow-sm shrink-0">
-          {([0.75, 1, 1.25] as const).map((rate) => (
-            <button
-              key={rate}
-              onClick={() => setPlaybackRate(rate)}
-              className={`px-2 py-1 rounded-lg text-xs font-display font-bold transition-all cursor-pointer ${
-                playbackRate === rate
-                  ? 'bg-[var(--color-brand-primary)] text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-              }`}
-              title={`Vitesse de lecture x${rate}`}
-            >
-              x{rate}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Typing Zone */}
-      <div className="p-6 md:p-8 flex-1 flex flex-col bg-white">
-        <label htmlFor="dictation-input" className="flex justify-between items-end mb-3">
-          <span className="text-sm font-display font-bold text-slate-500 flex items-center gap-2">
-            <Type className="w-4 h-4" /> Tapez le texte dicté :
-          </span>
-          <span className="text-sm font-display font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
-            {inputText.trim().split(/\s+/).filter(Boolean).length} mots
-          </span>
-        </label>
-
-        <textarea
-          id="dictation-input"
-          autoFocus
-          value={inputText}
-          onChange={handleChange}
-          rows={6}
-          placeholder="Écoutez la voix et commencez à taper ici..."
-          spellCheck={false}
-          className="w-full flex-1 p-6 bg-slate-50 border-2 border-slate-200 rounded-3xl text-xl font-sans text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[var(--color-brand-primary)] focus:bg-white transition-all shadow-inner leading-relaxed resize-none selection:bg-blue-100 selection:text-blue-900"
-        />
-
-        <div className="mt-4 flex items-center justify-center text-xs font-sans font-medium text-slate-400">
-          <span className="bg-slate-100 px-3 py-1 rounded-md">Sauvegarde automatique des frappes</span>
-        </div>
-      </div>
-    </div>
+    <GameView
+      status={roomState.status}
+      countdown={countdown}
+      roomCode={roomState.code}
+      players={roomState.players}
+      currentPlayerNickname={currentPlayerNickname}
+      secondsRemaining={secondsRemaining}
+      writingDuration={writingDuration}
+      inputText={inputText}
+      onInputChange={handleInputChange}
+      audio={{
+        playing: isAudioPlaying,
+        blocked: audioBlocked,
+        currentTime: audioCurrentTime,
+        duration: audioDuration || gameAudio?.duration || roomState.audioDurationSeconds,
+      }}
+      playbackRate={playbackRate}
+      onToggleAudio={toggleAudio}
+      onReplayAudio={replayAudio}
+      onPlayAudio={playAudio}
+      onPlaybackRateChange={setPlaybackRate}
+    />
   )
 }

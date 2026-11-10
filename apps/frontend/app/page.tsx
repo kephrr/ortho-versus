@@ -6,50 +6,47 @@ import { LobbyJoin } from '../components/LobbyJoin'
 import { RoomLobby } from '../components/RoomLobby'
 import { GameActive } from '../components/GameActive'
 import { GameResults } from '../components/GameResults'
+import { AppShell } from '../components/ui/AppShell'
 
 function TournamentArena() {
   const { roomState } = useSocket()
 
+  let screen: React.ReactNode
+
   if (!roomState) {
-    return <LobbyJoin />
+    screen = <LobbyJoin />
+  } else if (roomState.status === 'LOBBY') {
+    screen = <RoomLobby />
+  } else if (
+    roomState.status === 'STARTING' ||
+    roomState.status === 'PLAYING' ||
+    roomState.status === 'EVALUATING'
+  ) {
+    screen = <GameActive />
+  } else if (roomState.status === 'FINISHED') {
+    screen = <GameResults />
+  } else {
+    screen = <LobbyJoin />
   }
 
-  if (roomState.status === 'LOBBY') {
-    return <RoomLobby />
-  }
-
-  if (roomState.status === 'STARTING' || roomState.status === 'PLAYING' || roomState.status === 'EVALUATING') {
-    return <GameActive />
-  }
-
-  if (roomState.status === 'FINISHED') {
-    return <GameResults />
-  }
-
-  return <LobbyJoin />
+  return (
+    <AppShell
+      roomCode={roomState?.code}
+      centered={
+        !roomState ||
+        roomState.status === 'STARTING' ||
+        roomState.status === 'EVALUATING'
+      }
+    >
+      {screen}
+    </AppShell>
+  )
 }
 
 export default function Home() {
   return (
     <SocketProvider>
-      <main className="min-h-screen bg-[var(--background)] flex items-center justify-center p-4 sm:p-8">
-        <div className="w-full max-w-4xl mx-auto flex flex-col items-center">
-          
-          <header className="mb-12 text-center w-full">
-            <h1 className="text-5xl md:text-6xl font-display font-bold text-slate-800 tracking-tight">
-              Ortho <span className="text-[var(--color-brand-primary)]">Versus</span>
-            </h1>
-            <p className="mt-4 text-xl text-slate-500 font-sans font-medium">
-              Tapez avec précision, battez vos amis !
-            </p>
-          </header>
-
-          <div className="w-full relative">
-            <TournamentArena />
-          </div>
-          
-        </div>
-      </main>
+      <TournamentArena />
     </SocketProvider>
   )
 }

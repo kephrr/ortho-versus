@@ -1,16 +1,36 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
+import { Bricolage_Grotesque, Instrument_Sans, Instrument_Serif } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({
-  variable: '--font-inter',
+const display = Bricolage_Grotesque({
+  variable: '--font-bricolage',
   subsets: ['latin'],
   display: 'swap',
 })
 
+const sans = Instrument_Sans({
+  variable: '--font-instrument-sans',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const serif = Instrument_Serif({
+  variable: '--font-instrument-serif',
+  subsets: ['latin'],
+  weight: '400',
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
-  title: 'Ortho Versus - Concours de Dictée',
-  description: 'Un jeu d\'orthographe multijoueur fun et éducatif',
+  title: 'Ortho Versus — La dictée en duel',
+  description:
+    'Écoute un extrait, écris-le sans fautes et défie tes amis. La dictée multijoueur, simple et ludique.',
+  applicationName: 'Ortho Versus',
+}
+
+export const viewport: Viewport = {
+  themeColor: '#f6f1e7',
+  colorScheme: 'light',
 }
 
 export default function RootLayout({
@@ -21,11 +41,9 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${inter.variable} h-full antialiased`}
+      className={`${display.variable} ${sans.variable} ${serif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans text-slate-800 bg-[#F4F7F9]">
-        {children}
-      </body>
+      <body className="min-h-full font-sans text-ink">{children}</body>
     </html>
   )
 }
